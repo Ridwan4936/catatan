@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catatan Harian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E9EEF5;--paper:#FFFFFF;--ink:#1B2433;--muted:#5B6678;--line:#CFE0F3;--margin:#E4574F;--accent:#1F4FD8;--accent-ink:#fff;--danger:#B42318;--shadow:0 1px 0 rgba(27,36,51,.06),0 8px 24px -12px rgba(27,36,51,.25)}
+@media (prefers-color-scheme:dark){:root{--bg:#111722;--paper:#1A2231;--ink:#E7ECF4;--muted:#9AA6B8;--line:#2A3650;--margin:#FF7A72;--accent:#7AA2FF;--accent-ink:#0B1220;--danger:#FF8A80;--shadow:0 8px 24px -12px rgba(0,0,0,.6)}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 "Source Serif 4",Georgia,serif;min-height:100vh}
+h1,h2,h3,button,input,label,.ui{font-family:"Bricolage Grotesque",system-ui,sans-serif}
+button{cursor:pointer;font-size:15px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hidden{display:none!important}
+.btn{border:0;border-radius:8px;padding:10px 16px;background:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
+.btn:disabled{opacity:.6;cursor:wait}
+.ruled{background-color:var(--paper);background-image:linear-gradient(90deg,transparent 47px,var(--margin) 47px,var(--margin) 49px,transparent 49px),repeating-linear-gradient(transparent,transparent 31px,var(--line) 31px,var(--line) 32px);background-position:0 0,0 8px}
+#auth{display:grid;place-items:center;min-height:100vh;padding:20px}
+.sheet{width:100%;max-width:440px;border-radius:6px;box-shadow:var(--shadow);padding:28px 24px 28px 68px}
+.sheet h1{margin:0 0 4px;font-size:30px;line-height:32px}
+.sheet p.sub{margin:0 0 16px;color:var(--muted);line-height:32px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:6px 2px;margin-right:12px;font-weight:700;color:var(--muted)}
+.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--accent)}
+label{display:block;font-size:14px;font-weight:500;margin:10px 0 4px}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.msg{min-height:22px;margin:10px 0 0;font:500 14px "Bricolage Grotesque",sans-serif;color:var(--danger)}
+.msg.ok{color:var(--accent)}
+.sheet .btn{margin-top:10px;width:100%}
+header.top{display:flex;align-items:center;gap:12px;padding:14px 20px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+header.top h2{margin:0;font-size:22px;flex:1}
+.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--line)}
+.who{font:500 14px "Bricolage Grotesque",sans-serif;text-align:right;line-height:1.2}
+.role{display:inline-block;padding:1px 8px;border-radius:99px;border:1px solid var(--accent);color:var(--accent);font-size:12px}
+main{max-width:1000px;margin:0 auto;padding:20px}
+.bar{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.bar input[type=search]{flex:1;min-width:180px}
+.adminbar{display:flex;align-items:center;gap:8px;margin-bottom:18px;font:500 14px "Bricolage Grotesque",sans-serif}
+.adminbar input{width:auto}
+.day{margin:26px 0 10px;font-size:18px}
+.day small{color:var(--muted);font-weight:500;margin-left:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.note{border-radius:6px;box-shadow:var(--shadow);padding:10px 16px 14px 62px;display:flex;flex-direction:column;min-height:200px}
+.note h3{margin:0;font-size:18px;line-height:32px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note p{margin:0;line-height:32px;height:96px;overflow:hidden;white-space:pre-wrap;word-break:break-word}
+.note .meta{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font:13px "Bricolage Grotesque",sans-serif;color:var(--muted)}
+.note .acts{display:flex;gap:6px}
+.note .acts button{padding:4px 10px;font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:48px 12px}
+dialog{border:0;padding:0;background:transparent;max-width:560px;width:calc(100% - 24px)}
+dialog::backdrop{background:rgba(10,15,25,.55)}
+dialog .sheet{max-width:none;padding-top:18px}
+dialog h2{margin:0 0 6px;line-height:32px;font-size:22px}
+dialog textarea{min-height:200px;line-height:32px;resize:vertical;background:transparent;border:0;border-radius:0;padding:0}
+dialog input.t{background:transparent;border:0;border-radius:0;padding:0;font:700 20px/32px "Bricolage Grotesque",sans-serif}
+dialog input.d{width:auto;margin-bottom:4px}
+.row{display:flex;gap:10px;margin-top:12px}.row .btn{width:auto}
+@media (prefers-reduced-motion:no-preference){.note{transition:transform .15s}.note:hover{transform:translateY(-2px)}}
+</style>
+</head>
+<body>
+
+<section id="app">
+  <header class="top">
+    <h2>Catatan Harian</h2>
+  </header>
+  <main>
+    <div class="bar">
+      <input id="search" type="search" placeholder="Cari judul atau isi catatan" aria-label="Cari catatan">
+      <button class="btn" id="new">Catatan hari ini</button>
+    </div>
+    <div id="list"></div>
+  </main>
+</section>
+
+<dialog id="dlg">
+  <form method="dialog" class="sheet ruled" id="note-form">
+    <h2 id="dlg-title">Catatan baru</h2>
+    <input class="d" id="n-date" type="date" aria-label="Tanggal" required>
+    <input class="t" id="n-title" placeholder="Judul" aria-label="Judul" maxlength="150" required>
+    <textarea id="n-content" placeholder="Ceritakan harimu di sini" aria-label="Isi catatan" required></textarea>
+    <p class="msg" id="n-msg" role="alert"></p>
+    <div class="row">
+      <button type="submit" class="btn" id="n-save">Simpan catatan</button>
+      <button type="button" class="btn ghost" id="n-cancel">Batal</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+let notes = [], editingId = null;
+const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const fmtDay = s => { const [y, m, d] = s.slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); };
+
+async function api(path, opts = {}) {
+  const headers = {};
+  if (opts.body) { headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(opts.body); }
+  const res = await fetch(path, { ...opts, headers });
+  let data = null; try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error((data && data.message) || "Terjadi kesalahan (" + res.status + ")");
+  return data;
+}
+
+function setEmpty(text) { const l = $("list"); l.innerHTML = ""; const p = document.createElement("p"); p.className = "empty"; p.textContent = text; l.append(p); }
+
+async function loadNotes() {
+  try { notes = (await api("/api/notes")).notes; render(); }
+  catch (e) { setEmpty("Gagal memuat catatan: " + e.message); }
+}
+
+function render() {
+  const q = $("search").value.toLowerCase(), box = $("list"); box.innerHTML = "";
+  const list = notes.filter(n => (n.title + " " + n.content).toLowerCase().includes(q));
+  if (!list.length) { setEmpty(notes.length ? "Tidak ada catatan yang cocok." : "Belum ada catatan. Klik Catatan hari ini untuk mulai menulis."); return; }
+  let lastDay = null, grid = null;
+  list.forEach(n => {
+    const day = n.note_date.slice(0, 10);
+    if (day !== lastDay) {
+      lastDay = day;
+      const h = document.createElement("h3"); h.className = "day"; h.textContent = day === todayStr() ? "Hari ini" : fmtDay(day);
+      if (day === todayStr()) { const s = document.createElement("small"); s.textContent = fmtDay(day); h.append(s); }
+      grid = document.createElement("div"); grid.className = "grid"; box.append(h, grid);
+    }
+    const card = document.createElement("article"); card.className = "note ruled";
+    const t = document.createElement("h3"); t.textContent = n.title;
+    const p = document.createElement("p"); p.textContent = n.content;
+    const meta = document.createElement("div"); meta.className = "meta";
+    const acts = document.createElement("div"); acts.className = "acts";
+    const ed = document.createElement("button"); ed.className = "btn ghost"; ed.textContent = "Ubah"; ed.onclick = () => openForm(n);
+    const del = document.createElement("button"); del.className = "btn danger"; del.textContent = "Hapus"; del.onclick = () => removeNote(n.id, n.title);
+    acts.append(ed, del); meta.append(document.createElement("span"), acts); card.append(t, p, meta); grid.append(card);
+  });
+}
+$("search").oninput = render;
+
+function openForm(n) {
+  editingId = n ? n.id : null;
+  $("dlg-title").textContent = n ? "Ubah catatan" : "Catatan baru";
+  $("n-date").value = n ? n.note_date.slice(0, 10) : todayStr();
+  $("n-title").value = n ? n.title : ""; $("n-content").value = n ? n.content : ""; $("n-msg").textContent = "";
+  $("dlg").showModal(); $("n-title").focus();
+}
+$("new").onclick = () => openForm(null);
+$("n-cancel").onclick = () => $("dlg").close();
+$("note-form").onsubmit = async e => {
+  e.preventDefault();
+  const btn = $("n-save"); btn.disabled = true; $("n-msg").textContent = "";
+  const body = { title: $("n-title").value.trim(), content: $("n-content").value.trim(), note_date: $("n-date").value };
+  try {
+    await api(editingId ? "/api/notes/" + editingId : "/api/notes", { method: editingId ? "PUT" : "POST", body });
+    $("dlg").close(); loadNotes();
+  } catch (err) { $("n-msg").textContent = err.message; }
+  finally { btn.disabled = false; }
+};
+async function removeNote(id, title) {
+  if (!confirm('Hapus catatan "' + title + '"?')) return;
+  try { await api("/api/notes/" + id, { method: "DELETE" }); loadNotes(); } catch (e) { alert(e.message); }
+}
+
+loadNotes();
+</script>
+</body>
+</html>
